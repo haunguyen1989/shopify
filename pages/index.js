@@ -30,7 +30,7 @@ class Index extends React.Component {
                         }}
                         image={img}
                     >
-                        <p>Select products to change their price temporarily.</p>
+                        <p>Select products to change their price temporarily up.</p>
                     </EmptyState>
                 </Layout>
 
