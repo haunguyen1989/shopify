@@ -9,7 +9,9 @@ import ClientRouter from '../components/ClientRouter';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 const client = new ApolloClient({
-    
+    fetchOptions: {
+        credentials: 'include'
+    },
 });
 class MyApp extends App {
     render() {
