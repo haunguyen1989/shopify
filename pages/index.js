@@ -12,44 +12,21 @@ class Index extends React.Component {
         const emptyState = !store.get('ids');
         return (
             <Page>
-                <TitleBar
-                    title="Sample App"
-                    primaryAction={{
-                        content: 'Select products',
-                    }}
-                />
-                <ResourcePicker
-                    resourceType="Product"
-                    showVariants={false}
-                    open={this.state.open}
-                    onSelection={(resources) => this.handleSelection(resources)}
-                    onCancel={() => this.setState({ open: false })}
-                />
-                {emptyState ? (
-                    <Layout>
-                        <EmptyState
-                            heading="Discount your products temporarily"
-                            action={{
-                                content: 'Select products',
-                                onAction: () => this.setState({ open: true }),
-                            }}
-                            image={img}
-                        >
-                            <p>Select products to change their price temporarily up.</p>
-                        </EmptyState>
-                    </Layout>
-                ) : (
-                    <ResourceListWithProducts />
-                )}
+                <Layout>
+                    <EmptyState
+                        heading="Discount your products temporarily"
+                        action={{
+                            content: 'Select products',
+                            onAction: () => this.setState({ open: true }),
+                        }}
+                        image={img}
+                    >
+                        <p>Select products to change their price temporarily up.</p>
+                    </EmptyState>
+                </Layout>}
             </Page>
         );
     }
-    handleSelection = (resources) => {
-        const idsFromResources = resources.selection.map((product) => product.id);
-        this.setState({ open: false });
-        console.log(idsFromResources);
-        store.set('ids', idsFromResources);
-    };
 }
 
 export default Index;

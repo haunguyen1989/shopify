@@ -9,7 +9,7 @@ const session = require('koa-session');
 dotenv.config();
 const { default: graphQLProxy } = require('@shopify/koa-shopify-graphql-proxy');
 const { ApiVersion } = require('@shopify/koa-shopify-graphql-proxy');
-const port = parseInt(process.env.PORT, 10) || 80;
+const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -33,18 +33,19 @@ app.prepare().then(() => {
                     secure: true,
                     sameSite: 'none'
                 });
+                console.log('afterAuth accessToken:' + accessToken);
                 ctx.redirect('/');
             },
         }),
     );
-    server.use(graphQLProxy({version: ApiVersion.October20}))
+    server.use(graphQLProxy({version: ApiVersion.October20}));
     server.use(verifyRequest());
 
     server.use(async (ctx) => {
         await handle(ctx.req, ctx.res);
         ctx.respond = false;
         ctx.res.statusCode = 200;
-        return
+        return true;
     });
     server.listen(port, () => {
         console.log(`> Ready on http://localhost:${port}`);
