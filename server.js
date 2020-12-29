@@ -102,10 +102,10 @@ app.prepare().then(() => {
 
   router.post('/webhooks/orders/create', webhook, (ctx) => {
     console.log('received webhook: ', ctx.state.webhook);
-    const data = JSON.parse(ctx.state.webhook);
-    const orderId = data.payload.id;
+    //const data = JSON.parse(ctx.state.webhook);
+    //const orderId = data.payload.id;
 
-    console.log('orderId: ', orderId);
+   // console.log('orderId: ', orderId);
     const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/orders/3150846787761.json';
     fetch(url, { method: "GET", })
         .then(response => response.json()).then(json => console.log(json))
