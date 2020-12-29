@@ -6,9 +6,6 @@ const { default: createShopifyAuth } = require('@shopify/koa-shopify-auth');
 const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const session = require('koa-session');
 
-const router = require('@koa/router')();
-//const koaBody = require('koa-body');
-
 dotenv.config();
 const { default: graphQLProxy } = require('@shopify/koa-shopify-graphql-proxy');
 const { ApiVersion } = require('@shopify/koa-shopify-graphql-proxy');
@@ -23,21 +20,6 @@ app.prepare().then(() => {
     const server = new Koa();
     server.use(session({ secure: true, sameSite: 'none' }, server));
     server.keys = [SHOPIFY_API_SECRET_KEY];
-
-    //server.use(koaBody());
-
-    router.get('/app/ninjavan', view_ninjavan)
-        .post('/app/ninjavan', create_ninjavan);
-
-    server.use(router.routes());
-
-    async function view_ninjavan(ctx) {
-        ctx.respond = 'Hello ban con2';
-    }
-
-    async function create_ninjavan(ctx) {
-        ctx.respond = 'Hello ban con';
-    }
 
     server.use(
         createShopifyAuth({
@@ -63,7 +45,7 @@ app.prepare().then(() => {
         console.log('REQUEST to');
         console.log(ctx.req);
         await handle(ctx.req, ctx.res);
-        ctx.respond = 'Hello ban con';
+        ctx.respond = false;
         ctx.res.statusCode = 200;
         return true;
     });
