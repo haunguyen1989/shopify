@@ -19,6 +19,7 @@ const posts = [
     }
 ];
 export default (req, res) => {
+    console.log('GOI TOI DAY REQUEST FULLFULLMENT');
     console.log(req);
     res.statusCode = 200;
     res.json(posts)
