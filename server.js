@@ -56,9 +56,9 @@ app.prepare().then(() => {
           console.log(registration.result.data.webhookSubscriptionCreate.userErrors);
         }
         console.log('afterAuth accessToken:' + accessToken);
-        console.log('HOST:' + `${shopDomain}/webhooks/products/create`);
+        console.log('HOST:' + `${HOST}/webhooks/products/create`);
         await getSubscriptionUrl(ctx, accessToken, shop);
-        ctx.redirect('/');
+        //ctx.redirect('/');
       }
     })
   );
