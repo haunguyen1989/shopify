@@ -10,7 +10,7 @@ const { default: graphQLProxy } = require('@shopify/koa-shopify-graphql-proxy');
 const { ApiVersion } = require('@shopify/koa-shopify-graphql-proxy');
 const Router = require('koa-router');
 const { receiveWebhook, registerWebhook } = require('@shopify/koa-shopify-webhooks');
-const getSubscriptionUrl = require('./server/getSubscriptionUrl');
+//const getSubscriptionUrl = require('./server/getSubscriptionUrl');
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -57,8 +57,8 @@ app.prepare().then(() => {
         }
         console.log('afterAuth accessToken:' + accessToken);
         console.log('HOST:' + `${HOST}/webhooks/products/create`);
-        await getSubscriptionUrl(ctx, accessToken, shop);
-        //ctx.redirect('/');
+        //await getSubscriptionUrl(ctx, accessToken, shop);
+        ctx.redirect('/');
       }
     })
   );
