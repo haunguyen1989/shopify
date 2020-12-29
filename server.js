@@ -40,7 +40,7 @@ app.prepare().then(() => {
           secure: true,
           sameSite: 'none'
         });
-        const shopDomain = "https://" + shop;
+
         const registration = await registerWebhook({
           address: `${HOST}/webhooks/products/create`,
           topic: 'PRODUCTS_CREATE',
@@ -50,11 +50,42 @@ app.prepare().then(() => {
         });
 
         if (registration.success) {
-          console.log('Successfully registered webhook!');
+          console.log('Successfully registered webhook product!');
         } else {
-          console.log('Failed to register webhook', registration.result);
+          console.log('Failed to register webhook product', registration.result);
           console.log(registration.result.data.webhookSubscriptionCreate.userErrors);
         }
+
+        const registration2 = await registerWebhook({
+          address: `${HOST}/webhooks/fulfillments/create`,
+          topic: 'FULFILLMENTS_CREATE',
+          accessToken,
+          shop,
+          apiVersion: ApiVersion.October20
+        });
+
+        if (registration2.success) {
+          console.log('Successfully registered webhook fullfillment!');
+        } else {
+          console.log('Failed to register webhook fullfillment', registration2.result);
+          console.log(registration2.result.data.webhookSubscriptionCreate.userErrors);
+        }
+
+        const registration3 = await registerWebhook({
+          address: `${HOST}/webhooks/orders/create`,
+          topic: 'ORDERS_CREATE',
+          accessToken,
+          shop,
+          apiVersion: ApiVersion.October20
+        });
+
+        if (registration3.success) {
+          console.log('Successfully registered webhook order create!');
+        } else {
+          console.log('Failed to register webhook order create', registration3.result);
+          console.log(registration3.result.data.webhookSubscriptionCreate.userErrors);
+        }
+
         console.log('afterAuth accessToken:' + accessToken);
         console.log('HOST:' + `${HOST}/webhooks/products/create`);
         //await getSubscriptionUrl(ctx, accessToken, shop);
