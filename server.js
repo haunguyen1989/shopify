@@ -7,12 +7,12 @@ const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const session = require('koa-session');
 
 const router = require('@koa/router')();
-const koaBody = require('koa-body');
+//const koaBody = require('koa-body');
 
 dotenv.config();
 const { default: graphQLProxy } = require('@shopify/koa-shopify-graphql-proxy');
 const { ApiVersion } = require('@shopify/koa-shopify-graphql-proxy');
-const port = parseInt(process.env.PORT, 10) || 80;
+const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -24,7 +24,7 @@ app.prepare().then(() => {
     server.use(session({ secure: true, sameSite: 'none' }, server));
     server.keys = [SHOPIFY_API_SECRET_KEY];
 
-    server.use(koaBody());
+    //server.use(koaBody());
 
     router.get('/app/ninjavan', view_ninjavan)
         .post('/app/ninjavan', create_ninjavan);
