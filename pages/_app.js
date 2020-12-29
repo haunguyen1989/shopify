@@ -20,7 +20,7 @@ class MyApp extends App {
         return (
             <React.Fragment>
                 <Head>
-                    <title>Sample App</title>
+                    <title>Ninjavan Delivery</title>
                     <meta charSet="utf-8" />
                 </Head>
 
