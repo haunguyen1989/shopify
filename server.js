@@ -100,6 +100,14 @@ app.prepare().then(() => {
     console.log('received webhook: ', ctx.state.webhook);
   });
 
+  router.post('/webhooks/orders/create', webhook, (ctx) => {
+    console.log('received webhook: ', ctx.state.webhook);
+  });
+
+  router.post('/webhooks/fulfillments/create', webhook, (ctx) => {
+    console.log('received webhook: ', ctx.state.webhook);
+  });
+
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
 
   router.get('(.*)', verifyRequest(), async (ctx) => {
