@@ -40,8 +40,9 @@ app.prepare().then(() => {
           secure: true,
           sameSite: 'none'
         });
+        const shopDomain = "https://" + shop;
         const registration = await registerWebhook({
-          address: `${HOST}/webhooks/products/create`,
+          address: `${shopDomain}/webhooks/products/create`,
           topic: 'PRODUCTS_CREATE',
           accessToken,
           shop,
@@ -54,6 +55,7 @@ app.prepare().then(() => {
           console.log('Failed to register webhook', registration.result);
         }
         console.log('afterAuth accessToken:' + accessToken);
+        console.log('HOST:' + shop);
         ctx.redirect('/');
       }
     })
