@@ -132,10 +132,10 @@ app.prepare().then(() => {
 
           fulfillment_orders.forEach(fulfillment => {
               if(fulfillment.order_id === orderId) {
-                console.log('CREATE REQUEST FULLFILLMENT:' + fulfillment.fulfillment_order_id);
+                console.log('CREATE REQUEST FULLFILLMENT:' + fulfillment.id);
 
                 shopify.fulfillmentRequest
-                    .create(fulfillment.fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
+                    .create(fulfillment.id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => console.log(result))
                     .catch((err) => console.error(err));
                 /*shopify.order
