@@ -41,7 +41,7 @@ app.prepare().then(() => {
           secure: true,
           sameSite: 'none'
         });
-
+        console.log('accessToken:' + accessToken);
         const registration = await registerWebhook({
           address: `${HOST}/webhooks/products/create`,
           topic: 'PRODUCTS_CREATE',
