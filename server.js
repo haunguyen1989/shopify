@@ -155,12 +155,12 @@ app.prepare().then(() => {
 
                 })().catch(console.error);*/
 
-                /*shopify.fulfillmentRequest
+                shopify.fulfillmentRequest
                     .create(fulfillment.id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => {
                       console.log(result);
                     })
-                    .catch((err) => console.error(err));*/
+                    .catch((err) => console.error(err));
                 /*shopify.order
                     .list({ limit: 1 })
                     .then((orders) => console.log(orders))
@@ -174,7 +174,7 @@ app.prepare().then(() => {
   });
 
   router.post('/webhooks/fulfillments/create', webhook, async (ctx) => {
-    /*console.log('received webhook: ', ctx.state.webhook);
+    console.log('received webhook: ', ctx.state.webhook);
     const dataFullFill = ctx.state.webhook;
     console.log(dataFullFill);
     console.log('CALL GET ACCESS TOKEN ');
@@ -201,7 +201,7 @@ app.prepare().then(() => {
         .then((result) => {
           console.log(result);
         })
-        .catch((err) => console.error(err));*/
+        .catch((err) => console.error(err));
   });
 
   router.post('/ninjavan/create', create);
