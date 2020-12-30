@@ -126,7 +126,7 @@ app.prepare().then(() => {
               if(fulfillment.order_id === orderId) {
                 console.log('CREATE REQUEST FULLFILLMENT');
                 shopify.fulfillmentRequest
-                    .create(fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
+                    .create(fulfillment.fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => console.log(result))
                     .catch((err) => console.error(err));
               }
