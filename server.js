@@ -33,7 +33,8 @@ app.prepare().then(() => {
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
-      scopes: ['read_products', 'write_products', 'read_fulfillments', 'write_fulfillments', 'read_orders', 'write_orders', 'read_shipping', 'write_shipping'],
+      scopes: ['read_fulfillments', 'write_fulfillments', 'read_assigned_fulfillment_orders', 'write_assigned_fulfillment_orders', 'read_shipping', 'write_shipping', 'read_orders', 'write_orders', 'read_products', 'write_products', 'write_merchant_managed_fulfillment_orders',
+        'read_assigned_fulfillment_orders', 'write_assigned_fulfillment_orders'],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         ctx.cookies.set("shopOrigin", shop, {
@@ -111,7 +112,7 @@ app.prepare().then(() => {
     const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/assigned_fulfillment_orders.json';
     fetch(url, { method: "GET", })
         .then(response => response.json()).then(json => {
-          console.log(json.fulfillment_orders);
+          //console.log(json.fulfillment_orders);
           const fulfillment_orders = json.fulfillment_orders;
       const shopify = new Shopify({
         shopName: 'isobar-demo',
@@ -125,7 +126,7 @@ app.prepare().then(() => {
      // console.log('Token:' + accessTokenShopify);
 
       /*shopify.order
-          .list({ limit: 5 })
+          .list({ limit: 1 })
           .then((orders) => console.log(orders))
           .catch((err) => console.error(err));*/
 
@@ -133,10 +134,15 @@ app.prepare().then(() => {
               if(fulfillment.order_id === orderId) {
                 console.log('CREATE REQUEST FULLFILLMENT');
 
-                shopify.fulfillmentRequest
+                /*shopify.fulfillmentRequest
                     .create(fulfillment.fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => console.log(result))
+                    .catch((err) => console.error(err));*/
+                shopify.order
+                    .list({ limit: 1 })
+                    .then((orders) => console.log(orders))
                     .catch((err) => console.error(err));
+
               }
 
 
