@@ -106,7 +106,7 @@ app.prepare().then(() => {
     //const data = JSON.parse(ctx.state.webhook);
 
     //console.log('order ID: ', ctx.state.webhook.payload.id);
-    const orderId = data.payload.id;
+    const orderId = ctx.state.webhook.payload.id;
     console.log('FETCH assigned_fulfillment_orders');
     const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/assigned_fulfillment_orders.json';
     fetch(url, { method: "GET", })
