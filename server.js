@@ -122,12 +122,12 @@ app.prepare().then(() => {
         shopName: 'isobar-demo',
         accessToken: accessTokenShopify
       });*/
-      console.log('Token:' + accessTokenShopify);
+     // console.log('Token:' + accessTokenShopify);
 
-      shopify.order
+      /*shopify.order
           .list({ limit: 5 })
           .then((orders) => console.log(orders))
-          .catch((err) => console.error(err));
+          .catch((err) => console.error(err));*/
 
           fulfillment_orders.forEach(fulfillment => {
               if(fulfillment.order_id === orderId) {
