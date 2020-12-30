@@ -154,8 +154,14 @@ app.prepare().then(() => {
     console.log('received webhook: ', ctx.state.webhook);
   });
 
+  router.post('/ninjavan/create', create);
+  async function create(ctx) {
+    console.log('received ninjavan 2');
+    ctx.respond = 'OK';
+  }
   router.post('/ninjavan/received', (ctx) => {
     console.log('received ninjavan');
+    ctx.respond = 'OK';
   });
 
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
