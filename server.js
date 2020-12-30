@@ -21,6 +21,9 @@ const {
   SHOPIFY_API_SECRET_KEY,
   SHOPIFY_API_KEY,
   HOST,
+  HOST_NINJAVAN,
+  CLIENT_ID,
+  CLIENT_SECRET
 } = process.env;
 global.accessTokenShopify = '';
 app.prepare().then(() => {
@@ -156,10 +159,118 @@ app.prepare().then(() => {
 
   router.post('/ninjavan/create', create);
   async function create(ctx) {
-    console.log('received ninjavan 2');
+    console.log('CALL GET ACCESS TOKEN ');
+    const tokenBear = await generateOAuthAccessToken();
+    console.log('CALL CREATE ORDER ');
+    const result = await createOrder(tokenBear);
+    console.log(result);
     ctx.respond = 'OK';
     ctx.res.statusCode = 200;
+
   }
+
+  async function generateOAuthAccessToken(){
+    const body = {
+      "client_id": CLIENT_ID,
+      "client_secret": CLIENT_SECRET,
+      "grant_type": "client_credentials"
+    };
+
+    const response = await fetch(`${HOST_NINJAVAN}/VN/2.0/oauth/access_token`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
+    });
+    const json = await response.json();
+
+    console.log(json);
+
+    return json;
+  }
+
+  async function createOrder(token){
+    const body = {
+      "service_type": "Parcel",
+      "service_level": "Standard",
+      "requested_tracking_number": "1234-56789",
+      "reference": {
+        "merchant_order_number": "SHIP-1234-56789"
+      },
+      "from": {
+        "name": "John Doe",
+        "phone_number": "+60122222222",
+        "email": "john.doe@gmail.com",
+        "address": {
+          "address1": "17 Lorong Jambu 3",
+          "address2": "",
+          "area": "Taman Sri Delima",
+          "city": "Simpang Ampat",
+          "state": "Pulau Pinang",
+          "address_type": "office",
+          "country": "MY",
+          "postcode": "51200"
+        }
+      },
+      "to": {
+        "name": "Jane Doe",
+        "phone_number": "+6212222222222",
+        "email": "jane.doe@gmail.com",
+        "address": {
+          "address1": "Gedung Balaikota DKI Jakarta",
+          "address2": "Jalan Medan Merdeka Selatan No. 10",
+          "kelurahan": "Kelurahan Gambir",
+          "kecamatan": "Kecamatan Gambir",
+          "city": "Jakarta Selatan",
+          "province": "Jakarta",
+          "country": "ID",
+          "postcode": "10110"
+        }
+      },
+      "parcel_job": {
+        "is_pickup_required": true,
+        "pickup_address_id": 98989012,
+        "pickup_service_type": "Scheduled",
+        "pickup_service_level": "Premium",
+        "pickup_date": "2018-01-18T00:00:00.000Z",
+        "pickup_timeslot": {
+          "start_time": "09:00",
+          "end_time": "12:00",
+          "timezone": "Asia/Singapore"
+        },
+        "pickup_instructions": "Pickup with care!",
+        "delivery_instructions": "If recipient is not around, leave parcel in power riser.",
+        "delivery_start_date": "2018-01-19",
+        "delivery_timeslot": {
+          "start_time": "09:00",
+          "end_time": "22:00",
+          "timezone": "Asia/Singapore"
+        },
+        "items": [
+          {
+            "item_description": "item description 1",
+            "quantity": 1,
+            "is_dangerous_good": false
+          }
+        ]
+      }
+    };
+
+    const response = await fetch(`${HOST_NINJAVAN}/VN/4.1/orders`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+      }
+    });
+    const json = await response.json();
+
+    console.log(json);
+
+    return json;
+  }
+
   router.post('/ninjavan/received', (ctx) => {
     console.log('received ninjavan');
     ctx.respond = 'OK';
@@ -167,7 +278,6 @@ app.prepare().then(() => {
   });
 
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
-
 
   router.get('(.*)', verifyRequest(), async (ctx) => {
     await handle(ctx.req, ctx.res);
