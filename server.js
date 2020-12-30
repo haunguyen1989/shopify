@@ -110,10 +110,11 @@ app.prepare().then(() => {
     const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/assigned_fulfillment_orders.json';
     fetch(url, { method: "GET", })
         .then(response => response.json()).then(json => {
-          console.log(json);
-          json.forEach(element => {
-            console.log('phan tu');
-            console.log(element);
+          console.log(json.fulfillment_orders);
+          const fulfillment_orders = json.fulfillment_orders;
+          fulfillment_orders.forEach(fulfillment => {
+                console.log('phan tu');
+                console.log(fulfillment);
           });
     })
   });
