@@ -33,7 +33,7 @@ app.prepare().then(() => {
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
-      scopes: ['read_products', 'write_products', 'read_fulfillments', 'write_fulfillments', 'read_orders', 'write_orders'],
+      scopes: ['read_products', 'write_products', 'read_fulfillments', 'write_fulfillments', 'read_orders', 'write_orders', 'read_shipping', 'write_shipping'],
       async afterAuth(ctx) {
         const { shop, accessToken } = ctx.session;
         ctx.cookies.set("shopOrigin", shop, {
@@ -41,7 +41,7 @@ app.prepare().then(() => {
           secure: true,
           sameSite: 'none'
         });
-        console.log('accessToken:' + accessToken);
+
         const registration = await registerWebhook({
           address: `${HOST}/webhooks/products/create`,
           topic: 'PRODUCTS_CREATE',
@@ -113,15 +113,15 @@ app.prepare().then(() => {
         .then(response => response.json()).then(json => {
           console.log(json.fulfillment_orders);
           const fulfillment_orders = json.fulfillment_orders;
-      const shopify = new Shopify({
+      /*const shopify = new Shopify({
         shopName: 'isobar-demo',
         apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
         password: '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'
-      });
-     /* const shopify = new Shopify({
+      });*/
+      const shopify = new Shopify({
         shopName: 'isobar-demo',
         accessToken: '18403cca44c691d0febf13a1f944721f'
-      });*/
+      });
           fulfillment_orders.forEach(fulfillment => {
               if(fulfillment.order_id === orderId) {
                 console.log('CREATE REQUEST FULLFILLMENT');
