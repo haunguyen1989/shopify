@@ -161,11 +161,11 @@ app.prepare().then(() => {
   async function create(ctx) {
     console.log('CALL GET ACCESS TOKEN ');
     const tokenBear = await generateOAuthAccessToken();
-    console.log('CALL CREATE ORDER ');
-    const result = await createOrder(tokenBear);
+    console.log('CALL CREATE ORDER:' + tokenBear.access_token);
+    const result = await createOrder(tokenBear.access_token);
     console.log(result);
-    ctx.respond = 'OK';
-    ctx.res.statusCode = 200;
+    ctx.response.status = 200;
+    ctx.response.body = result;
 
   }
 
@@ -181,9 +181,10 @@ app.prepare().then(() => {
       body: JSON.stringify(body),
       headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
     });
+    console.log(response);
     const json = await response.json();
 
-    console.log(json);
+
 
     return json;
   }
