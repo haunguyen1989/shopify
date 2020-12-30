@@ -25,6 +25,13 @@ const {
   CLIENT_ID,
   CLIENT_SECRET
 } = process.env;
+
+const shopify = new Shopify({
+  shopName: 'isobar-demo',
+  apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
+  password: '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'
+});
+
 global.accessTokenShopify = '';
 app.prepare().then(() => {
   const server = new Koa();
@@ -117,11 +124,7 @@ app.prepare().then(() => {
         .then(response => response.json()).then(json => {
           //console.log(json.fulfillment_orders);
           const fulfillment_orders = json.fulfillment_orders;
-      const shopify = new Shopify({
-        shopName: 'isobar-demo',
-        apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
-        password: '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'
-      });
+
       /*const shopify = new Shopify({
         shopName: 'isobar-demo',
         accessToken: accessTokenShopify
@@ -179,7 +182,21 @@ app.prepare().then(() => {
     console.log('CALL CREATE ORDER:' + tokenBear.access_token);
     const result = await createOrder(tokenBear.access_token, dataFullFill);
 
-    console.log(result);
+    console.log(result.tracking_number);
+    console.log('MAKE FULLFILLED ');
+    shopify.fulfillment
+        .create(dataFullFill.payload.order_id,{
+          "location_id": dataFullFill.payload.location_id,
+          "tracking_number": result.tracking_number,
+          "tracking_urls": [
+            "https://shipping.xyz/track.php?num=" + result.tracking_number
+          ],
+          "notify_customer": true
+        })
+        .then((result) => {
+          console.log(result);
+        })
+        .catch((err) => console.error(err));
   });
 
   router.post('/ninjavan/create', create);
