@@ -132,16 +132,16 @@ app.prepare().then(() => {
 
           fulfillment_orders.forEach(fulfillment => {
               if(fulfillment.order_id === orderId) {
-                console.log('CREATE REQUEST FULLFILLMENT');
+                console.log('CREATE REQUEST FULLFILLMENT:' + fulfillment.fulfillment_order_id);
 
-                /*shopify.fulfillmentRequest
+                shopify.fulfillmentRequest
                     .create(fulfillment.fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => console.log(result))
-                    .catch((err) => console.error(err));*/
-                shopify.order
+                    .catch((err) => console.error(err));
+                /*shopify.order
                     .list({ limit: 1 })
                     .then((orders) => console.log(orders))
-                    .catch((err) => console.error(err));
+                    .catch((err) => console.error(err));*/
 
               }
 
