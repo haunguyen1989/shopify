@@ -105,7 +105,7 @@ app.prepare().then(() => {
     console.log('received webhook: ', ctx.state.webhook);
   });
 
-  router.post('/webhooks/orders/create', webhook, (ctx) => {
+  router.post('/webhooks/orders/create', webhook,  (ctx) => {
     //console.log('received webhook: ', ctx.state.webhook);
     //const data = JSON.parse(ctx.state.webhook);
 
@@ -137,10 +137,27 @@ app.prepare().then(() => {
               if(fulfillment.order_id === orderId) {
                 console.log('CREATE REQUEST FULLFILLMENT:' + fulfillment.id);
 
-                shopify.fulfillmentRequest
+                (async () => {
+                  const dataFullFill = await shopify.fulfillmentRequest
+                      .create(fulfillment.id,{ message: 'Fulfill this ASAP please' });
+
+                  console.log('DATA FULLFILL');
+                  console.log(dataFullFill);
+                    console.log('CALL GET ACCESS TOKEN ');
+                    const tokenBear = await generateOAuthAccessToken();
+                    console.log('CALL CREATE ORDER:' + tokenBear.access_token);
+                    const result = await createOrder(tokenBear.access_token, dataFullFill);
+
+                     console.log(result);
+
+                })().catch(console.error);
+
+               /* shopify.fulfillmentRequest
                     .create(fulfillment.id,{ message: 'Fulfill this ASAP please' })
-                    .then((result) => console.log(result))
-                    .catch((err) => console.error(err));
+                    .then((result) => {
+                      console.log(result);
+                    })
+                    .catch((err) => console.error(err));*/
                 /*shopify.order
                     .list({ limit: 1 })
                     .then((orders) => console.log(orders))
@@ -189,7 +206,7 @@ app.prepare().then(() => {
     return json;
   }
 
-  async function createOrder(token){
+  async function createOrder(token, dataFullFill){
     const body = {
       "service_type": "Parcel",
       "service_level": "Standard",
