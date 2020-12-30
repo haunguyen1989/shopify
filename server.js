@@ -22,7 +22,7 @@ const {
   SHOPIFY_API_KEY,
   HOST,
 } = process.env;
-
+global.accessTokenShopify = '';
 app.prepare().then(() => {
   const server = new Koa();
   const router = new Router();
@@ -41,7 +41,7 @@ app.prepare().then(() => {
           secure: true,
           sameSite: 'none'
         });
-
+        accessTokenShopify = accessToken;
         const registration = await registerWebhook({
           address: `${HOST}/webhooks/products/create`,
           topic: 'PRODUCTS_CREATE',
@@ -118,9 +118,10 @@ app.prepare().then(() => {
         apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
         password: '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'
       });*/
+      console.log('Token:' + accessTokenShopify);
       const shopify = new Shopify({
         shopName: 'isobar-demo',
-        accessToken: '18403cca44c691d0febf13a1f944721f'
+        accessToken: accessTokenShopify
       });
           fulfillment_orders.forEach(fulfillment => {
               if(fulfillment.order_id === orderId) {
