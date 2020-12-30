@@ -8,6 +8,7 @@ const { verifyRequest } = require('@shopify/koa-shopify-auth');
 const session = require('koa-session');
 const { default: graphQLProxy } = require('@shopify/koa-shopify-graphql-proxy');
 const { ApiVersion } = require('@shopify/koa-shopify-graphql-proxy');
+const Shopify = require('shopify-api-node');
 const Router = require('koa-router');
 const { receiveWebhook, registerWebhook } = require('@shopify/koa-shopify-webhooks');
 //const getSubscriptionUrl = require('./server/getSubscriptionUrl');
@@ -103,18 +104,34 @@ app.prepare().then(() => {
   router.post('/webhooks/orders/create', webhook, (ctx) => {
     //console.log('received webhook: ', ctx.state.webhook);
     //const data = JSON.parse(ctx.state.webhook);
-    //const orderId = data.payload.id;
-    console.log('order ID: ', ctx.state.webhook.payload.id);
 
+    //console.log('order ID: ', ctx.state.webhook.payload.id);
+    const orderId = data.payload.id;
     console.log('FETCH assigned_fulfillment_orders');
     const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/assigned_fulfillment_orders.json';
     fetch(url, { method: "GET", })
         .then(response => response.json()).then(json => {
           console.log(json.fulfillment_orders);
           const fulfillment_orders = json.fulfillment_orders;
+     /* const shopify = new Shopify({
+        shopName: 'isobar-demo',
+        apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
+        password: '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'
+      });*/
+      const shopify = new Shopify({
+        shopName: 'isobar-demo',
+        accessToken: '18403cca44c691d0febf13a1f944721f'
+      });
           fulfillment_orders.forEach(fulfillment => {
-                console.log('phan tu');
-                console.log(fulfillment);
+              if(fulfillment.order_id === orderId) {
+                console.log('CREATE REQUEST FULLFILLMENT');
+                shopify.fulfillmentRequest
+                    .create(fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
+                    .then((result) => console.log(result))
+                    .catch((err) => console.error(err));
+              }
+
+
           });
     })
   });
