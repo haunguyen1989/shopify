@@ -137,7 +137,7 @@ app.prepare().then(() => {
               if(fulfillment.order_id === orderId) {
                 console.log('CREATE REQUEST FULLFILLMENT:' + fulfillment.id);
 
-                (async () => {
+               /* (async () => {
                   const dataFullFill = await shopify.fulfillmentRequest
                       .create(fulfillment.id,{ message: 'Fulfill this ASAP please' });
 
@@ -150,14 +150,14 @@ app.prepare().then(() => {
 
                      console.log(result);
 
-                })().catch(console.error);
+                })().catch(console.error);*/
 
-               /* shopify.fulfillmentRequest
+                shopify.fulfillmentRequest
                     .create(fulfillment.id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => {
                       console.log(result);
                     })
-                    .catch((err) => console.error(err));*/
+                    .catch((err) => console.error(err));
                 /*shopify.order
                     .list({ limit: 1 })
                     .then((orders) => console.log(orders))
@@ -170,8 +170,16 @@ app.prepare().then(() => {
     })
   });
 
-  router.post('/webhooks/fulfillments/create', webhook, (ctx) => {
+  router.post('/webhooks/fulfillments/create', webhook, async (ctx) => {
     console.log('received webhook: ', ctx.state.webhook);
+    const dataFullFill = ctx.state.webhook;
+    console.log(dataFullFill);
+    console.log('CALL GET ACCESS TOKEN ');
+    const tokenBear = await generateOAuthAccessToken();
+    console.log('CALL CREATE ORDER:' + tokenBear.access_token);
+    const result = await createOrder(tokenBear.access_token, dataFullFill);
+
+    console.log(result);
   });
 
   router.post('/ninjavan/create', create);
@@ -207,41 +215,42 @@ app.prepare().then(() => {
   }
 
   async function createOrder(token, dataFullFill){
+    const payload = dataFullFill.payload;
     const body = {
       "service_type": "Parcel",
       "service_level": "Standard",
       "requested_tracking_number": "1234-56789",
       "reference": {
-        "merchant_order_number": "SHIP-1234-56789"
+        "merchant_order_number": "SHIP" + payload.order_id
       },
       "from": {
-        "name": "John Doe",
-        "phone_number": "+60122222222",
-        "email": "john.doe@gmail.com",
+        "name": payload.destination.first_name,
+        "phone_number": payload.destination.phone,
+        "email": payload.email,
         "address": {
-          "address1": "17 Lorong Jambu 3",
+          "address1": payload.destination.address1,
           "address2": "",
           "area": "Taman Sri Delima",
-          "city": "Simpang Ampat",
-          "state": "Pulau Pinang",
+          "city": payload.destination.city,
+          "state": payload.destination.province,
           "address_type": "office",
-          "country": "MY",
-          "postcode": "51200"
+          "country": payload.destination.country_code,
+          "postcode": payload.destination.zip
         }
       },
       "to": {
-        "name": "Jane Doe",
-        "phone_number": "+6212222222222",
-        "email": "jane.doe@gmail.com",
+        "name": payload.destination.first_name,
+        "phone_number": payload.destination.phone,
+        "email": payload.email,
         "address": {
-          "address1": "Gedung Balaikota DKI Jakarta",
+          "address1": payload.destination.address1,
           "address2": "Jalan Medan Merdeka Selatan No. 10",
           "kelurahan": "Kelurahan Gambir",
           "kecamatan": "Kecamatan Gambir",
-          "city": "Jakarta Selatan",
-          "province": "Jakarta",
-          "country": "ID",
-          "postcode": "10110"
+          "city": payload.destination.city,
+          "province": payload.destination.province,
+          "country": payload.destination.country_code,
+          "postcode": payload.destination.zip
         }
       },
       "parcel_job": {
