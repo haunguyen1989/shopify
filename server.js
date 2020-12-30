@@ -101,15 +101,21 @@ app.prepare().then(() => {
   });
 
   router.post('/webhooks/orders/create', webhook, (ctx) => {
-    console.log('received webhook: ', ctx.state.webhook);
+    //console.log('received webhook: ', ctx.state.webhook);
     //const data = JSON.parse(ctx.state.webhook);
     //const orderId = data.payload.id;
+    console.log('order ID: ', ctx.state.webhook.payload.id);
 
-   console.log(ctx.state.webhook.payload);
     console.log('FETCH assigned_fulfillment_orders');
     const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/assigned_fulfillment_orders.json';
     fetch(url, { method: "GET", })
-        .then(response => response.json()).then(json => console.log(json))
+        .then(response => response.json()).then(json => {
+          console.log(json);
+          json.forEach(element => {
+            console.log('phan tu');
+            console.log(element);
+          });
+    })
   });
 
   router.post('/webhooks/fulfillments/create', webhook, (ctx) => {
