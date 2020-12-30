@@ -184,15 +184,20 @@ app.prepare().then(() => {
 
     console.log(result.tracking_number);
     console.log('MAKE FULLFILLED ');
+
+    const orderID = dataFullFill.payload.order_id;
+    const paras = {
+      "location_id": dataFullFill.payload.location_id,
+      "tracking_number": result.tracking_number,
+      "tracking_urls": [
+        "https://shipping.xyz/track.php?num=" + result.tracking_number
+      ],
+      "notify_customer": true
+    };
+    console.log('ORDER_ID:'  + orderID);
+    console.log(paras);
     shopify.fulfillment
-        .create(dataFullFill.payload.order_id,{
-          "location_id": dataFullFill.payload.location_id,
-          "tracking_number": result.tracking_number,
-          "tracking_urls": [
-            "https://shipping.xyz/track.php?num=" + result.tracking_number
-          ],
-          "notify_customer": true
-        })
+        .create(orderID, paras)
         .then((result) => {
           console.log(result);
         })
