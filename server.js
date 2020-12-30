@@ -158,10 +158,12 @@ app.prepare().then(() => {
   async function create(ctx) {
     console.log('received ninjavan 2');
     ctx.respond = 'OK';
+    ctx.res.statusCode = 200;
   }
   router.post('/ninjavan/received', (ctx) => {
     console.log('received ninjavan');
     ctx.respond = 'OK';
+    ctx.res.statusCode = 200;
   });
 
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
