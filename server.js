@@ -113,19 +113,26 @@ app.prepare().then(() => {
         .then(response => response.json()).then(json => {
           console.log(json.fulfillment_orders);
           const fulfillment_orders = json.fulfillment_orders;
-      /*const shopify = new Shopify({
+      const shopify = new Shopify({
         shopName: 'isobar-demo',
         apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
         password: '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'
-      });*/
-      console.log('Token:' + accessTokenShopify);
-      const shopify = new Shopify({
+      });
+      /*const shopify = new Shopify({
         shopName: 'isobar-demo',
         accessToken: accessTokenShopify
-      });
+      });*/
+      console.log('Token:' + accessTokenShopify);
+
+      shopify.order
+          .list({ limit: 5 })
+          .then((orders) => console.log(orders))
+          .catch((err) => console.error(err));
+
           fulfillment_orders.forEach(fulfillment => {
               if(fulfillment.order_id === orderId) {
                 console.log('CREATE REQUEST FULLFILLMENT');
+
                 shopify.fulfillmentRequest
                     .create(fulfillment.fulfillment_order_id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => console.log(result))
