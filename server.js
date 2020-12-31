@@ -123,7 +123,7 @@ app.prepare().then(() => {
     fetch(url, { method: "GET", })
         .then(response => response.json()).then(json => {
           const fulfillment_orders = json.fulfillment_orders;
-          
+
       /*shopify.order
           .list({ limit: 1 })
           .then((orders) => console.log(orders))
@@ -189,12 +189,50 @@ app.prepare().then(() => {
     };
     console.log('ORDER_ID:'  + orderID);
     console.log(paras);
-    shopify.fulfillment
+    /*shopify.fulfillment
         .create(orderID, paras)
         .then((result) => {
           console.log(result);
         })
+        .catch((err) => console.error(err));*/
+
+    const query = `mutation {
+  fulfillmentCreateV2 (
+    fulfillment: {
+      trackingInfo: {
+        number: "223424253"
+      },
+      notifyCustomer: true,
+      lineItemsByFulfillmentOrder: 
+      [
+        {
+          fulfillmentOrderId: "gid://shopify/FulfillmentOrder/4359221346481",
+          fulfillmentOrderLineItems: [
+            {
+              id: "gid://shopify/FulfillmentOrderLineItem/8190270832817",
+              quantity: 1
+            }
+          ]
+        }
+      ]
+    }
+  ) 
+  {
+    fulfillment {     
+        id         
+     }    
+     userErrors {     
+      field 
+      message      
+     }  
+  }
+}`;
+
+    shopify
+        .graphql(query)
+        .then((customers) => console.log(customers.fulfillmentCreateV2.userErrors))
         .catch((err) => console.error(err));
+
   });
 
   router.post('/ninjavan/create', create);
@@ -317,6 +355,49 @@ app.prepare().then(() => {
     console.log('received ninjavan');
     ctx.respond = 'OK';
     ctx.res.statusCode = 200;
+  });
+
+
+  router.post('/test/received', (ctx) => {
+    const query = `mutation {
+  fulfillmentCreateV2 (
+    fulfillment: {
+      trackingInfo: {
+        number: "223424253"
+      },
+      notifyCustomer: true,
+      lineItemsByFulfillmentOrder: 
+      [
+        {
+          fulfillmentOrderId: "gid://shopify/FulfillmentOrder/4359221346481",
+          fulfillmentOrderLineItems: [
+            {
+              id: "gid://shopify/FulfillmentOrderLineItem/8190270832817",
+              quantity: 1
+            }
+          ]
+        }
+      ]
+    }
+  ) 
+  {
+    fulfillment {     
+        id         
+     }    
+     userErrors {     
+      field 
+      message      
+     }  
+  }
+}`;
+
+    shopify
+        .graphql(query)
+        .then((customers) => console.log(customers.fulfillmentCreateV2.userErrors))
+        .catch((err) => console.error(err));
+
+    ctx.response.status = 200;
+    ctx.response.body = {data: 'Good!'};
   });
 
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
