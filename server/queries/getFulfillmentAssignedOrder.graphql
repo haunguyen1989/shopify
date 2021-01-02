@@ -1,19 +1,14 @@
-query OrderFullfillment($id: ID!) {
-    order(id: $id) {
-        fulfillments(first:1){
-          id
-          status
-          location {
+query getAssignedFulfillmentOrders {
+    shop {
+      assignedFulfillmentOrders(first: 100) {
+        edges {
+          cursor
+          node {
             id
-            name
-          }
-          name
-          totalQuantity
-          trackingInfo {
-            company
-            number
-            url
+            status
+            requestStatus
           }
         }
+      }
       }
 }

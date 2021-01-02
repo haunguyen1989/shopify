@@ -118,7 +118,7 @@ app.prepare().then(() => {
   });
 
   router.post('/webhooks/orders/create', webhook,  (ctx) => {
-    //console.log('received webhook: ', ctx.state.webhook);
+    console.log('received webhook: ', ctx.state.webhook);
     //const data = JSON.parse(ctx.state.webhook);
 
     //console.log('order ID: ', ctx.state.webhook.payload.id);
