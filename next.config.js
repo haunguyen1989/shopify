@@ -8,6 +8,13 @@ module.exports = withCSS({
   webpack: (config) => {
     const env = { API_KEY: apiKey };
     config.plugins.push(new webpack.DefinePlugin(env));
+
+    config.module.rules.push({
+      test: /\.(graphql|gql)$/,
+      exclude: /node_modules/,
+      loader: 'graphql-tag/loader'
+    });
+
     return config;
   },
 });

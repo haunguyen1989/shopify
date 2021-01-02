@@ -11,6 +11,11 @@ const { ApiVersion } = require('@shopify/koa-shopify-graphql-proxy');
 const Shopify = require('shopify-api-node');
 const Router = require('koa-router');
 const { receiveWebhook, registerWebhook } = require('@shopify/koa-shopify-webhooks');
+
+
+
+const fulfillment = require('./server/fulfillment');
+
 //const getSubscriptionUrl = require('./server/getSubscriptionUrl');
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
@@ -26,7 +31,7 @@ const {
   CLIENT_SECRET
 } = process.env;
 
-const shopify = new Shopify({
+global.shopify = new Shopify({
   shopName: 'isobar-demo',
   apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
   password: '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'
@@ -148,12 +153,12 @@ app.prepare().then(() => {
 
                 })().catch(console.error);*/
 
-                shopify.fulfillmentRequest
+               /* shopify.fulfillmentRequest
                     .create(fulfillment.id,{ message: 'Fulfill this ASAP please' })
                     .then((result) => {
                       console.log(result);
                     })
-                    .catch((err) => console.error(err));
+                    .catch((err) => console.error(err));*/
                 /*shopify.order
                     .list({ limit: 1 })
                     .then((orders) => console.log(orders))
@@ -358,46 +363,11 @@ app.prepare().then(() => {
   });
 
 
-  router.post('/test/received', (ctx) => {
-    const query = `mutation {
-  fulfillmentCreateV2 (
-    fulfillment: {
-      trackingInfo: {
-        number: "223424253"
-      },
-      notifyCustomer: true,
-      lineItemsByFulfillmentOrder: 
-      [
-        {
-          fulfillmentOrderId: "gid://shopify/FulfillmentOrder/4359221346481",
-          fulfillmentOrderLineItems: [
-            {
-              id: "gid://shopify/FulfillmentOrderLineItem/8190270832817",
-              quantity: 1
-            }
-          ]
-        }
-      ]
-    }
-  ) 
-  {
-    fulfillment {     
-        id         
-     }    
-     userErrors {     
-      field 
-      message      
-     }  
-  }
-}`;
-
-    shopify
-        .graphql(query)
-        .then((customers) => console.log(customers.fulfillmentCreateV2.userErrors))
-        .catch((err) => console.error(err));
-
+  router.post('/test/received', async (ctx) => {
+    const res = await fulfillment.retrievesWithOrder("gid://shopify/Order/3152559472817");
     ctx.response.status = 200;
-    ctx.response.body = {data: 'Good!'};
+    ctx.response.body = {data: res.order.fulfillments[0].id};
+
   });
 
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
