@@ -369,7 +369,15 @@ app.prepare().then(() => {
     ctx.response.body = {data: res.order.fulfillments[0].id};
 
   });
+router.post('/test/script', (ctx) => {
+    const PassThrough = require('stream').PassThrough;
+    const request = require('request');
 
+    const url = '/script.js';
+    ctx.set('Content-Type', 'application/javascript');
+    ctx.body = request(url).pipe(PassThrough());
+
+  });
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
 
 
