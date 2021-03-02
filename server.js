@@ -379,10 +379,13 @@ router.get('/test/script', (ctx) => {
 
   });
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
-
-
-  console.log(router.allowedMethods());
-  server.use(router.allowedMethods());
+  server.use(verifyRequest());
+  server.use(async (ctx) => {
+       await handle(ctx.req, ctx.res);
+       ctx.respond = false;
+       ctx.res.statusCode = 200;
+       return
+   });
   server.use(router.routes());
 
   server.listen(port, () => {
