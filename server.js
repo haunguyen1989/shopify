@@ -381,7 +381,7 @@ router.get('/test/script', (ctx) => {
   server.use(graphQLProxy({ version: ApiVersion.October20 }));
 
 
-
+  console.log(router.allowedMethods());
   server.use(router.allowedMethods());
   server.use(router.routes());
 
