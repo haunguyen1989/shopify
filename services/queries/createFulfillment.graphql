@@ -1,0 +1,17 @@
+mutation makeFulfillmentRequest($id: ID!) {
+  fulfillmentOrderSubmitFulfillmentRequest(id: $id) {
+    originalFulfillmentOrder {
+      id
+    }
+    submittedFulfillmentOrder {
+      id
+    }
+    unsubmittedFulfillmentOrder {
+      id
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}

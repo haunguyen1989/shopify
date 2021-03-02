@@ -1,0 +1,11 @@
+mutation fulfillmentCreateV2($fulfillment: FulfillmentV2Input!) {
+  fulfillmentCreateV2(fulfillment: $fulfillment) {
+    fulfillment {
+      id
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}

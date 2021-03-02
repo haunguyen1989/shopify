@@ -1,4 +1,4 @@
-query OrderFullfillment($id: ID!) {
+query retrievesWithOrder($id: ID!) {
     order(id: $id) {
         fulfillments(first:1){
           id

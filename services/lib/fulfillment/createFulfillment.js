@@ -1,4 +1,4 @@
-const { GET_FULFILLMENT_ORDER } = require('../lib/schema');
+const { GET_FULFILLMENT_ORDER } = require('../../queries/schema');
 
 const retrievesWithOrder = async (orderGid) => {
     const query = GET_FULFILLMENT_ORDER;

@@ -1,0 +1,34 @@
+query assignedFulfillmentOrders($after: String) {
+    shop {
+      assignedFulfillmentOrders(first: 10, after: $after) {
+        edges {
+          cursor
+          node {
+            supportedActions {
+              action
+            }
+            id
+            status
+            requestStatus
+            order {
+              id
+              fulfillmentOrders(first:1) {
+                edges {
+                  node {
+                    id
+                    lineItems(first: 50) {
+                      edges {
+                        node {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
