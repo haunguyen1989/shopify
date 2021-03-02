@@ -18,9 +18,21 @@ const posts = [
         name: 'Bridging in React Native'
     }
 ];
+
 export default (req, res) => {
-    console.log('GOI TOI DAY REQUEST FULLFULLMENT');
-    console.log(req);
-    res.statusCode = 200;
-    res.json(posts)
+    var http = require('http'),
+    fileSystem = require('fs'),
+    path = require('path');
+    
+    var filePath = path.join(__dirname, '/script.js');
+    var stat = fileSystem.statSync(filePath);
+
+    res.writeHead(200, {
+        'Content-Type': 'application/javascript',
+        'Content-Length': stat.size
+    });
+
+    var readStream = fileSystem.createReadStream(filePath);
+    // We replaced all the event handlers with a simple call to readStream.pipe()
+    readStream.pipe(res);
 }
