@@ -369,7 +369,7 @@ app.prepare().then(() => {
     ctx.response.body = {data: res.order.fulfillments[0].id};
 
   });
-router.post('/test/script', (ctx) => {
+router.get('/test/script', (ctx) => {
     const PassThrough = require('stream').PassThrough;
     const request = require('request');
 
