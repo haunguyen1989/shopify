@@ -22,6 +22,6 @@ export default (req, res) => {
     res.statusCode = 200;
     res.json(posts)*/
     res.statusCode = 200;
-    res.set('Content-Type', 'application/javascript');
+    res.setHeader('Content-Type', 'application/javascript');
     res.send(`console.log("Hello moi nguoi");`);
 }
