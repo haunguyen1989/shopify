@@ -17,7 +17,7 @@ var myAppJavaScript = function($){
 };
 
 if ((typeof jQuery === 'undefined') || (parseFloat(jQuery.fn.jquery) < 1.7)) {
-    loadScript('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', function(){
+    loadScript('http://ajax.googleapis.com/ajax/libs/jquery/2.2.3/jquery.min.js', function(){
         jQuery191 = jQuery.noConflict(true);
         myAppJavaScript(jQuery191);
     });
