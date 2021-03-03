@@ -1,11 +1,15 @@
-const { GET_FULFILLMENT_ORDER } = require('../../queries/schema');
+const { RETRIEVES_FULFILLMENT_ASSOCIATED } = require('../../queries/schema');
 
-const retrievesWithOrder = async (orderGid) => {
-    const query = GET_FULFILLMENT_ORDER;
+const retrievesFulfillmentAssociated = async (ID) => {
+    const query = RETRIEVES_FULFILLMENT_ASSOCIATED;
     const variables = {
-        "id": orderGid
+        "id": ID
     };
-    return await shopify.graphql(query, variables).catch((err) => console.error(err));
+    const res = await shopify.graphql(query, variables).catch((err) => console.error(err));
+    if(res.order.fulfillments) {
+        return  res.order.fulfillments[0].id;
+    }
+    return false;
 };
 
-module.exports = retrievesWithOrder;
+module.exports = retrievesFulfillmentAssociated;

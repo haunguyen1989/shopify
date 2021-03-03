@@ -1,8 +1,8 @@
-import mongoose from 'mongoose';
 
+const mongoose = require('mongoose');
 const connection = {};
 
-async function dbConnect() {
+const dbConnect = async () => {
     if (connection.isConnected) {
         return;
     }
@@ -13,6 +13,6 @@ async function dbConnect() {
     });
 
     connection.isConnected = db.connections[0].readyState;
-}
+};
 
-export default dbConnect;
+module.exports = dbConnect;

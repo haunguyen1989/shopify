@@ -1,3 +1,3 @@
 module.exports = {
-    initialize: require('./app')
+    uninstaller: require('./app')
 };

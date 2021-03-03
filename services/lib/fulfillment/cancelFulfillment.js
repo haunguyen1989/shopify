@@ -1,31 +1,16 @@
-const { GET_FULFILLMENT_ORDER } = require('../../queries/schema');
+const { CANCEL_FULFILLMENT_ASSOCIATED } = require('../../queries/schema');
 
-const createFulfillment = async (payload) => {
-    const query = GET_FULFILLMENT_ORDER;
-    let lineItemsByFulfillmentOrder = [];
-
-
+const cancelFulfillment = async (ID) => {
+    const query = CANCEL_FULFILLMENT_ASSOCIATED;
     const variables = {
-        fulfillment: {
-            trackingInfo: {
-                number: "223424253"
-            },
-            notifyCustomer: true,
-            lineItemsByFulfillmentOrder:
-                [
-                    {
-                        fulfillmentOrderId: "gid://shopify/FulfillmentOrder/4360542224561",
-                        fulfillmentOrderLineItems: [
-                            {
-                                id: "gid://shopify/FulfillmentOrderLineItem/8192956367025",
-                                quantity: 1
-                            }
-                        ]
-                    }
-                ]
-        }
+        "id": ID
     };
-    return await shopify.graphql(query, variables).catch((err) => console.error(err));
+    const res = await shopify.graphql(query, variables).catch((err) => console.error(err));
+    if(res.fulfillmentCancel.userErrors.length > 0) {
+        console.error(res.fulfillmentCancel.userErrors);
+        return false;
+    }
+    return res;
 };
 
-module.exports = createFulfillment;
+module.exports = cancelFulfillment;

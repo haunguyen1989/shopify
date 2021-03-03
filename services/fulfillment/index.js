@@ -1,3 +1,4 @@
 module.exports = {
-    makeRequest: require('./sendRequestFulfillment')
+    requestTracking: require('./requestTracking'),
+    requestFulfillment: require('./requestFulfillment')
 };

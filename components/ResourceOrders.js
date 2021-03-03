@@ -11,115 +11,60 @@ import store from 'store-js';
 import { Redirect } from '@shopify/app-bridge/actions';
 import { Context } from '@shopify/app-bridge-react';
 
-const GET_PRODUCTS_BY_ID = gql`
-  query getProducts($ids: [ID!]!) {
-    nodes(ids: $ids) {
-      ... on Product {
-        title
-        handle
-        descriptionHtml
-        id
-        images(first: 1) {
-          edges {
-            node {
-              originalSrc
-              altText
+const GET_ORDERS = gql`
+  query OrderUnfulfilled {
+    orders(first: 50, sortKey:CREATED_AT, reverse: true, after: null) {
+  edges {
+   cursor
+    node {
+      id
+      createdAt
+      name
+      displayFulfillmentStatus
+      fulfillments {
+        status
+      }
+     
+      fulfillmentOrders(first: 1) {
+        edges {
+          node {
+            id
+            supportedActions {
+              action
+              externalUrl
             }
-          }
-        }
-        variants(first: 1) {
-          edges {
-            node {
-              price
-              id
+            lineItems(first: 1) {
+              edges {
+                node {
+                  id
+                }
+              }
             }
           }
         }
       }
     }
   }
+ }
+}
 `;
 
-class ResourceListWithProducts extends React.Component {
-  static contextType = Context;
+class ResourceListWithOrders extends React.Component {
 
   render() {
-    const app = this.context;
-    const redirectToProduct = () => {
-      const redirect = Redirect.create(app);
-      redirect.dispatch(
-        Redirect.Action.APP,
-        '/edit-products',
-      );
-    };
-
-    const twoWeeksFromNow = new Date(Date.now() + 12096e5).toDateString();
-    console.log('product selected');
-    console.log(store.get('ids'));
     return (
-      <Query query={GET_PRODUCTS_BY_ID} variables={{ ids: store.get('ids') }}>
-        {({ data, loading, error }) => {
-          if (loading) { return <div>Loading…</div>; }
-          if (error) { return <div>{error.message}</div>; }
-          console.log(data);
-          return (
-            <Card>
-              <ResourceList
-                showHeader
-                resourceName={{ singular: 'Product', plural: 'Products' }}
-                items={data.nodes}
-                renderItem={(item) => {
-                  const media = (
-                    <Thumbnail
-                      source={
-                        item.images.edges[0]
-                          ? item.images.edges[0].node.originalSrc
-                          : ''
-                      }
-                      alt={
-                        item.images.edges[0]
-                          ? item.images.edges[0].node.altText
-                          : ''
-                      }
-                    />
-                  );
-                  const price = item.variants.edges[0].node.price;
-                  return (
-                    <ResourceList.Item
-                      id={item.id}
-                      media={media}
-                      accessibilityLabel={`View details for ${item.title}`}
-                      onClick={() => {
-                        store.set('item', item);
-                        redirectToProduct();
-                      }
-                      }
-                    >
-                      <Stack>
-                        <Stack.Item fill>
-                          <h3>
-                            <TextStyle variation="strong">
-                              {item.title}
-                            </TextStyle>
-                          </h3>
-                        </Stack.Item>
-                        <Stack.Item>
-                          <p>${price}</p>
-                        </Stack.Item>
-                        <Stack.Item>
-                          <p>Expires on {twoWeeksFromNow} </p>
-                        </Stack.Item>
-                      </Stack>
-                    </ResourceList.Item>
-                  );
-                }}
-              />
-            </Card>
-          );
-        }}
-      </Query>
+        <Query query={GET_ORDERS} variables={{ }}>
+          {({ data, loading, error }) => {
+            if (loading) { return <div>Loading…</div>; }
+            if (error) { return <div>{error.message}</div>; }
+            console.log(data);
+            return (
+                <div>Den day</div>
+            );
+          }}
+        </Query>
     );
   }
 }
 
-export default ResourceListWithProducts;
+export default ResourceListWithOrders;

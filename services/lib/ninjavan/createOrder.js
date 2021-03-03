@@ -6,7 +6,9 @@ const {
 const createOrder = async (payload) => {
     const token = await generateOAuthAccessToken();
     let body = buildData(payload);
-
+    console.log('============NINJAVAN-REQUEST==============');
+    console.log(body);
+    console.log('==========================================');
     const response = await fetch(`${HOST_NINJAVAN}/VN/4.1/orders`, {
         method: 'POST',
         body: JSON.stringify(body),
@@ -17,22 +19,32 @@ const createOrder = async (payload) => {
         }
     });
     const json = await response.json();
+    console.log('============NINJAVAN-CREATE-ORDER==============');
     console.log(json);
+    console.log('===============================================');
     return json;
 };
 
-const buildData = async (payload) => {
-    const body = {
+const buildData = (payload) => {
+    let items = [];
+    payload.line_items.forEach(line_item => {
+        items.push({
+            "item_description": line_item.title,
+            "quantity": line_item.quantity,
+            "is_dangerous_good": false
+        });
+    });
+    return {
         "service_type": payload.service_type,
         "service_level": payload.service_level,
         //"requested_tracking_number": "1234-56789",
         "reference": {
-            "merchant_order_number": "SHIP" + payload.order_id
+            "merchant_order_number": "SHIP-" + payload.order_id
         },
         "from": {
             "name": payload.from.name,
             "phone_number": payload.from.phone,
-            "email": payload.email,
+            "email": 'temp-localtion@isobar.com',
             "address": {
                 "address1": payload.from.address1,
                 "address2": payload.from.address2,
@@ -76,13 +88,7 @@ const buildData = async (payload) => {
                 "end_time": "22:00",
                 "timezone": "Asia/Singapore"
             },
-            "items": [
-                {
-                    "item_description": "item description 1",
-                    "quantity": 1,
-                    "is_dangerous_good": false
-                }
-            ]
+            "items": items
         }
     };
 };
@@ -100,6 +106,9 @@ const generateOAuthAccessToken = async () => {
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
     });
     console.log(response);
+    console.log('============NINJAVAN-TOKEN==============');
+    console.log(response);
+    console.log('========================================');
     return await response.json();
 };
 

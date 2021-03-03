@@ -1,0 +1,46 @@
+query fulfillmentOrders($id: ID!) {
+  order(id: $id) {
+    shippingLine {
+      code
+    }
+    shippingAddress {
+          name
+          address1
+          address2
+          city
+          province
+          country
+          countryCodeV2
+          zip
+          phone
+    }
+    fulfillmentOrders(first: 8) {
+      edges {
+        node {
+          id
+          assignedLocation {
+            name
+            phone
+            zip
+            address1
+            address2
+            city
+            province
+            countryCode
+          }
+          lineItems(first: 50) {
+            edges {
+              node {
+                lineItem {
+                  id
+                  name
+                  quantity
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

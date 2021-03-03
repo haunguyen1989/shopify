@@ -1,12 +1,31 @@
 const mongoose = require('mongoose');
 
-const StoreSchema = new mongoose.Schema({
-    domain: {
+const ConfigSchema = new mongoose.Schema({
+    shop_id: {
         type: String,
-        required: [true, 'Please add a domain'],
-        unique: true,
-        maxlength: [255, 'Domain cannot be more than 255 characters']
+        ref: 'Shop'
+    },
+    path: {
+        type: String
+    },
+    value: {
+        type: String
     }
+}, {
+    collection: 'configs'
 });
-const Store = mongoose.models.Store || mongoose.model('Store', StoreSchema);
-module.exports = Store;
+
+const ConfigModel = mongoose.models.Config || mongoose.model('Config', ConfigSchema);
+module.exports = ConfigModel;
+
+/*
+console.log('HELLO1');
+ConfigModel.find({
+    client_id: 'skgihsfhslfhsdlfs'
+})
+    .populate('shop_id')
+    .then(data => {
+    console.log(data);
+}).catch(error => {
+    console.log(error);
+});*/

@@ -1,4 +1,4 @@
 module.exports = {
-    requestTracking: require('./requestTracking'),
-    requestFulfillment: require('./requestFulfillment')
+    ShopModel: require('./Shop'),
+    ConfigModel: require('./Config')
 };

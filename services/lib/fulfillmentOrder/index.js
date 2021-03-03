@@ -1,3 +1,3 @@
 module.exports = {
-    getUnFulfilledOrder: require('./getUnFulfilledOrder')
+    getFulfilledOrders: require('./getFulfilledOrders')
 };

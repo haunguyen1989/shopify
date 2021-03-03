@@ -1,11 +1,17 @@
-const { GET_FULFILLMENT_ORDER } = require('../../queries/schema');
+const { CREATE_FULFILLMENT } = require('../../queries/schema');
 
-const retrievesWithOrder = async (orderGid) => {
-    const query = GET_FULFILLMENT_ORDER;
+const createFulfillment = async (payload) => {
+    const query = CREATE_FULFILLMENT;
+
     const variables = {
-        "id": orderGid
+        fulfillment: payload
     };
-    return await shopify.graphql(query, variables).catch((err) => console.error(err));
+    const res = await shopify.graphql(query, variables).catch((err) => console.error(err));
+    if(res.fulfillmentCreateV2.userErrors.length > 0) {
+        console.log(res.fulfillmentCreateV2.userErrors);
+        return false;
+    }
+    return res.fulfillmentCreateV2;
 };
 
-module.exports = retrievesWithOrder;
+module.exports = createFulfillment;

@@ -1,19 +1,7 @@
-query retrievesWithOrder($id: ID!) {
-    order(id: $id) {
-        fulfillments(first:1){
-          id
-          status
-          location {
-            id
-            name
-          }
-          name
-          totalQuantity
-          trackingInfo {
-            company
-            number
-            url
-          }
-        }
-      }
+query retrievesFulfillmentAssociated($id: ID!) {
+  order(id: $id) {
+    fulfillments {
+      id
+    }
+  }
 }

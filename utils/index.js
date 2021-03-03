@@ -1,3 +1,3 @@
 module.exports = {
-    process: require('./topic')
+    dbConnect: require('./dbConnect')
 };

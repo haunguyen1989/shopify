@@ -1,3 +1,3 @@
 module.exports = {
-    createShop: require('./store')
+    addConfig: require('./config')
 };

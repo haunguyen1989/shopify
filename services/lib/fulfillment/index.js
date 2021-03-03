@@ -1,4 +1,5 @@
 module.exports = {
-    retrievesWithOrder: require('./retrievesWithOrder'),
-    getAssignedFulfillmentUnSubmit: require('./getFulfillmentAssignedOrder'),
+    retrievesFulfillmentAssociated: require('./retrievesFulfillmentAssociated'),
+    createFulfillment: require('./createFulfillment'),
+    cancelFulfillment: require('./cancelFulfillment')
 };

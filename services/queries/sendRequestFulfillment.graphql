@@ -1,4 +1,4 @@
-mutation makeFulfillmentRequest($id: ID!) {
+mutation sendRequestFulfillment($id: ID!) {
   fulfillmentOrderSubmitFulfillmentRequest(id: $id) {
     originalFulfillmentOrder {
       id

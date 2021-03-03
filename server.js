@@ -12,9 +12,11 @@ const Shopify = require('shopify-api-node');
 const Router = require('koa-router');
 const { receiveWebhook, registerWebhook } = require('@shopify/koa-shopify-webhooks');
 
+var bodyParser = require('koa-bodyparser');
 
 
-const fulfillment = require('./server/fulfillment');
+const topic = require('./services/webhook');
+const installer = require('./services/init');
 
 //const getSubscriptionUrl = require('./server/getSubscriptionUrl');
 const port = parseInt(process.env.PORT, 10) || 3000;
@@ -25,22 +27,18 @@ const handle = app.getRequestHandler();
 const {
   SHOPIFY_API_SECRET_KEY,
   SHOPIFY_API_KEY,
-  HOST,
-  HOST_NINJAVAN,
-  CLIENT_ID,
-  CLIENT_SECRET
+  HOST
 } = process.env;
 
-global.shopify = new Shopify({
-  shopName: 'isobar-demo',
-  apiKey: '78da6c5e6d51c9e3ee7e797132fb53fd',
-  password: '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'
-});
+
 
 global.accessTokenShopify = '';
 app.prepare().then(() => {
   const server = new Koa();
   const router = new Router();
+
+  server.use(bodyParser());
+
   server.use(session({ sameSite: 'none', secure: true }, server));
   server.keys = [SHOPIFY_API_SECRET_KEY];
 
@@ -48,6 +46,7 @@ app.prepare().then(() => {
     createShopifyAuth({
       apiKey: SHOPIFY_API_KEY,
       secret: SHOPIFY_API_SECRET_KEY,
+      accessMode: 'offline',
       scopes: ['read_fulfillments', 'write_fulfillments', 'read_assigned_fulfillment_orders', 'write_assigned_fulfillment_orders', 'read_shipping', 'write_shipping', 'read_orders', 'write_orders', 'read_products', 'write_products', 'write_merchant_managed_fulfillment_orders',
         'read_assigned_fulfillment_orders', 'write_assigned_fulfillment_orders', 'read_third_party_fulfillment_orders', 'write_third_party_fulfillment_orders'],
       async afterAuth(ctx) {
@@ -103,8 +102,33 @@ app.prepare().then(() => {
           console.log(registration3.result.data.webhookSubscriptionCreate.userErrors);
         }
 
+        const registration4 = await registerWebhook({
+          address: `${HOST}/webhooks/app/uninstalled`,
+          topic: 'APP_UNINSTALLED',
+          accessToken,
+          shop,
+          apiVersion: ApiVersion.October20
+        });
+        if (registration4.success) {
+          console.log('Successfully registered webhook APP_UNINSTALLED!');
+        } else {
+          console.log('Failed to register webhook APP_UNINSTALLED', registration4.result);
+          console.log(registration4.result.data.webhookSubscriptionCreate.userErrors);
+        }
+
         console.log('afterAuth accessToken:' + accessToken);
         console.log('HOST:' + `${HOST}/webhooks/products/create`);
+
+        await installer.initialize(shop, accessToken);
+
+        global.shopify = new Shopify({
+          shopName: 'isobar-demo',
+          accessToken
+        });
+       /* shopify.order
+            .list({ limit: 5 })
+            .then((orders) => console.log(orders))
+            .catch((err) => console.error(err));*/
         //await getSubscriptionUrl(ctx, accessToken, shop);
         ctx.redirect('/');
       }
@@ -113,260 +137,114 @@ app.prepare().then(() => {
 
   const webhook = receiveWebhook({ secret: SHOPIFY_API_SECRET_KEY });
 
+  const responseResult = (ctx, res) => {
+    ctx.response.status = 200;
+    ctx.response.body = res;
+  };
   router.post('/webhooks/products/create', webhook, (ctx) => {
     console.log('received webhook: ', ctx.state.webhook);
   });
 
-  router.post('/webhooks/orders/create', webhook,  (ctx) => {
-    console.log('received webhook: ', ctx.state.webhook);
-    //const data = JSON.parse(ctx.state.webhook);
+  router.post('/webhooks/app/uninstalled', webhook, async (ctx) => {
+    console.log('received app/uninstalled');
 
-    //console.log('order ID: ', ctx.state.webhook.payload.id);
-    const orderId = ctx.state.webhook.payload.id;
-    console.log('FETCH assigned_fulfillment_orders');
-    const url = 'https://78da6c5e6d51c9e3ee7e797132fb53fd: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@isobar-demo.myshopify.com/admin/api/2020-10/assigned_fulfillment_orders.json';
-    fetch(url, { method: "GET", })
-        .then(response => response.json()).then(json => {
-          const fulfillment_orders = json.fulfillment_orders;
+    const res = await topic.process(ctx.state.webhook.topic, ctx.state.webhook.payload);
+  });
 
-      /*shopify.order
-          .list({ limit: 1 })
-          .then((orders) => console.log(orders))
-          .catch((err) => console.error(err));*/
+  router.post('/webhooks/orders/create', webhook, async (ctx) => {
+    /*if(!ctx.state.webhook.payload.fulfillment_status) {
+      console.log('received webhooks/orders/create');
+      console.log(ctx.state.webhook.payload);
+      const res = await topic.process(ctx.state.webhook.topic, ctx.state.webhook.payload);
+      console.log('result:');
+      console.log(res);
+      responseResult(ctx, res);
+    }
+    else {
+      responseResult(ctx, false);
+    }*/
 
-          fulfillment_orders.forEach(fulfillment => {
-              if(fulfillment.order_id === orderId) {
-                console.log('CREATE REQUEST FULLFILLMENT:' + fulfillment.id);
-
-               /* (async () => {
-                  const dataFullFill = await shopify.fulfillmentRequest
-                      .create(fulfillment.id,{ message: 'Fulfill this ASAP please' });
-
-                  console.log('DATA FULLFILL');
-                  console.log(dataFullFill);
-                    console.log('CALL GET ACCESS TOKEN ');
-                    const tokenBear = await generateOAuthAccessToken();
-                    console.log('CALL CREATE ORDER:' + tokenBear.access_token);
-                    const result = await createOrder(tokenBear.access_token, dataFullFill);
-
-                     console.log(result);
-
-                })().catch(console.error);*/
-
-               /* shopify.fulfillmentRequest
-                    .create(fulfillment.id,{ message: 'Fulfill this ASAP please' })
-                    .then((result) => {
-                      console.log(result);
-                    })
-                    .catch((err) => console.error(err));*/
-                /*shopify.order
-                    .list({ limit: 1 })
-                    .then((orders) => console.log(orders))
-                    .catch((err) => console.error(err));*/
-
-              }
-
-
-          });
-    })
   });
 
   router.post('/webhooks/fulfillments/create', webhook, async (ctx) => {
-    console.log('received webhook: ', ctx.state.webhook);
-    const dataFullFill = ctx.state.webhook;
-    console.log(dataFullFill);
-    console.log('CALL GET ACCESS TOKEN ');
-    const tokenBear = await generateOAuthAccessToken();
-    console.log('CALL CREATE ORDER:' + tokenBear.access_token);
-    const result = await createOrder(tokenBear.access_token, dataFullFill);
-
-    console.log(result.tracking_number);
-    console.log('MAKE FULLFILLED ');
-
-    const orderID = dataFullFill.payload.order_id;
-    const paras = {
-      "location_id": dataFullFill.payload.location_id,
-      "tracking_number": result.tracking_number,
-      "tracking_urls": [
-        "https://shipping.xyz/track.php?num=" + result.tracking_number
-      ],
-      "notify_customer": true
-    };
-    console.log('ORDER_ID:'  + orderID);
-    console.log(paras);
-    /*shopify.fulfillment
-        .create(orderID, paras)
-        .then((result) => {
-          console.log(result);
-        })
-        .catch((err) => console.error(err));*/
-
-    const query = `mutation {
-  fulfillmentCreateV2 (
-    fulfillment: {
-      trackingInfo: {
-        number: "223424253"
-      },
-      notifyCustomer: true,
-      lineItemsByFulfillmentOrder: 
-      [
-        {
-          fulfillmentOrderId: "gid://shopify/FulfillmentOrder/4359221346481",
-          fulfillmentOrderLineItems: [
-            {
-              id: "gid://shopify/FulfillmentOrderLineItem/8190270832817",
-              quantity: 1
-            }
-          ]
-        }
-      ]
+    /*if(ctx.state.webhook.payload.status === 'pending') {
+      console.log('received webhooks/fulfillments/create');
+      console.log(ctx.state.webhook.payload);
+      const res = await topic.process(ctx.state.webhook.topic, ctx.state.webhook.payload);
+      console.log('result:');
+      console.log(res);
+      responseResult(ctx, res);
     }
-  ) 
-  {
-    fulfillment {     
-        id         
-     }    
-     userErrors {     
-      field 
-      message      
-     }  
-  }
-}`;
-
-    shopify
-        .graphql(query)
-        .then((customers) => console.log(customers.fulfillmentCreateV2.userErrors))
-        .catch((err) => console.error(err));
-
+    else {
+      responseResult(ctx, false);
+    }*/
   });
 
-  router.post('/ninjavan/create', create);
-  async function create(ctx) {
-    console.log('CALL GET ACCESS TOKEN ');
-    const tokenBear = await generateOAuthAccessToken();
-    console.log('CALL CREATE ORDER:' + tokenBear.access_token);
-    const result = await createOrder(tokenBear.access_token);
-    console.log(result);
-    ctx.response.status = 200;
-    ctx.response.body = result;
-
-  }
-
-  async function generateOAuthAccessToken(){
-    const body = {
-      "client_id": CLIENT_ID,
-      "client_secret": CLIENT_SECRET,
-      "grant_type": "client_credentials"
-    };
-
-    const response = await fetch(`${HOST_NINJAVAN}/VN/2.0/oauth/access_token`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {'Content-Type': 'application/json', 'Accept': 'application/json'}
-    });
-    console.log(response);
-    const json = await response.json();
-
-
-
-    return json;
-  }
-
-  async function createOrder(token, dataFullFill){
-    const payload = dataFullFill.payload;
-    const body = {
-      "service_type": "Parcel",
-      "service_level": "Standard",
-      "requested_tracking_number": "1234-56789",
-      "reference": {
-        "merchant_order_number": "SHIP" + payload.order_id
-      },
-      "from": {
-        "name": payload.destination.first_name,
-        "phone_number": payload.destination.phone,
-        "email": payload.email,
-        "address": {
-          "address1": payload.destination.address1,
-          "address2": "",
-          "area": "Taman Sri Delima",
-          "city": payload.destination.city,
-          "state": payload.destination.province,
-          "address_type": "office",
-          "country": payload.destination.country_code,
-          "postcode": payload.destination.zip
-        }
-      },
-      "to": {
-        "name": payload.destination.first_name,
-        "phone_number": payload.destination.phone,
-        "email": payload.email,
-        "address": {
-          "address1": payload.destination.address1,
-          "address2": "Jalan Medan Merdeka Selatan No. 10",
-          "kelurahan": "Kelurahan Gambir",
-          "kecamatan": "Kecamatan Gambir",
-          "city": payload.destination.city,
-          "province": payload.destination.province,
-          "country": payload.destination.country_code,
-          "postcode": payload.destination.zip
-        }
-      },
-      "parcel_job": {
-        "is_pickup_required": true,
-        "pickup_address_id": 98989012,
-        "pickup_service_type": "Scheduled",
-        "pickup_service_level": "Premium",
-        "pickup_date": "2018-01-18T00:00:00.000Z",
-        "pickup_timeslot": {
-          "start_time": "09:00",
-          "end_time": "12:00",
-          "timezone": "Asia/Singapore"
-        },
-        "pickup_instructions": "Pickup with care!",
-        "delivery_instructions": "If recipient is not around, leave parcel in power riser.",
-        "delivery_start_date": "2018-01-19",
-        "delivery_timeslot": {
-          "start_time": "09:00",
-          "end_time": "22:00",
-          "timezone": "Asia/Singapore"
-        },
-        "items": [
-          {
-            "item_description": "item description 1",
-            "quantity": 1,
-            "is_dangerous_good": false
-          }
-        ]
-      }
-    };
-
-    const response = await fetch(`${HOST_NINJAVAN}/VN/4.1/orders`, {
-      method: 'POST',
-      body: JSON.stringify(body),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer ' + token
-      }
-    });
-    const json = await response.json();
-
-    console.log(json);
-
-    return json;
-  }
-
-  router.post('/ninjavan/received', (ctx) => {
+  router.post('/ninjavan/received', async ctx => {
     console.log('received ninjavan');
-    ctx.respond = 'OK';
-    ctx.res.statusCode = 200;
+    console.log(ctx.request.body.rate);
+    let rate = {
+      "rates": [
+        {
+          "service_name": "Giao hàng nhanh",
+          "service_code": "Express",
+          "total_price": "5000",
+          "description": "This is the fastest option by far",
+          "currency": "USD",
+          "min_delivery_date": "2021-01-05 14:48:45 -0400",
+          "max_delivery_date": "2021-01-07 14:48:45 -0400"
+        },
+        {
+          "service_name": "Giao hàng tiêu chuẩn",
+          "service_code": "Standard",
+          "total_price": "1000",
+          "currency": "USD",
+          "min_delivery_date": "2021-01-05 14:48:45 -0400",
+          "max_delivery_date": "2021-01-07 14:48:45 -0400"
+        },
+        {
+          "service_name": "Giao ngày mai",
+          "service_code": "Nextday",
+          "total_price": "1500",
+          "currency": "USD",
+          "min_delivery_date": "2021-01-04 14:48:45 -0400",
+          "max_delivery_date": "2021-01-05 14:48:45 -0400"
+        },
+        {
+          "service_name": "Giao trong ngày",
+          "service_code": "Sameday",
+          "total_price": "2000",
+          "currency": "USD",
+          "min_delivery_date": "2021-01-04 14:48:45 -0400",
+          "max_delivery_date": "2021-01-04 14:48:45 -0400"
+        }
+      ]
+    };
+    const shippingAddress = ctx.request.body.rate.destination;
+
+    ctx.response.status = 200;
+    ctx.response.body = rate;
+    //return rate;
   });
 
 
   router.post('/test/received', async (ctx) => {
-    const res = await fulfillment.retrievesWithOrder("gid://shopify/Order/3152559472817");
+    let payload = {
+      admin_graphql_api_id: 'gid://shopify/Order/3158470394033'
+    };
+    const res = await topic.process('ORDERS_CREATE', payload);
     ctx.response.status = 200;
-    ctx.response.body = {data: res.order.fulfillments[0].id};
+    ctx.response.body = {data: res};
+
+  });
+
+  router.post('/carrier/received', async (ctx) => {
+    console.log('received carrier/received');
+    const res = {
+      price: 100
+    };
+    ctx.response.status = 200;
+    ctx.response.body = {data: res};
 
   });
 
@@ -380,6 +258,7 @@ app.prepare().then(() => {
 
   server.use(router.allowedMethods());
   server.use(router.routes());
+
 
   server.listen(port, () => {
     console.log(`> Ready on http://localhost:${port}`);
