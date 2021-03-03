@@ -262,7 +262,8 @@ app.prepare().then(() => {
     ctx.res.statusCode = 200;
     return
   });
-  
+  server.use(router.allowedMethods());
+  server.use(router.routes());
 
 
   server.listen(port, () => {
