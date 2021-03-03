@@ -22,7 +22,7 @@ export default (req, res) => {
     res.statusCode = 200;
     res.json(posts)*/
     res.statusCode = 200;
-    res.send(`<script>
+    res.send(`
       console.log("Hello moi nguoi");
-    </script>`);
+    `);
 }
