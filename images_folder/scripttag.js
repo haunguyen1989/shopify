@@ -48,7 +48,7 @@ aren’t available to the outside world. */
         // $ in this scope references the jQuery object we'll use.
         // Don't use jQuery, or jQuery191, use the dollar sign.
         // Do this and do that, using $.
-        $('body').append('<p>Your app is using jQuery version '+$.fn.jquery+'</p>');
+        $('body').append('<p style="color: black; background-color: green; font-size: 16px;">Your app is using jQuery version '+$.fn.jquery+'</p>');
     };
 
     /* If jQuery has not yet been loaded or if it has but it's too old for our needs,
