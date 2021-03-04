@@ -23,5 +23,5 @@ export default (req, res) => {
     res.json(posts)*/
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/javascript');
-    res.send(`console.log("Hello moi nguoi");`);
+    res.send(`$('body').append('<p style="color: black; background-color: green; font-size: 16px;">Your app is using jQuery</p>');`);
 }
